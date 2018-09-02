@@ -2,10 +2,14 @@ package parser
 
 import (
 	"fmt"
+	"io/ioutil"
 	"strings"
 )
 
-var traceLevel int = 0
+var (
+	traceLevel int = 0
+	out            = ioutil.Discard
+)
 
 const traceIdentPlaceholder string = "\t"
 
@@ -14,7 +18,7 @@ func identLevel() string {
 }
 
 func tracePrint(fs string) {
-	fmt.Printf("%s%s\n", identLevel(), fs)
+	fmt.Fprintf(out, "%s%s\n", identLevel(), fs)
 }
 
 func incIdent() { traceLevel = traceLevel + 1 }

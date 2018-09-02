@@ -2,6 +2,7 @@ package ast
 
 import (
 	"bytes"
+	"strings"
 
 	"github.com/ymgyt/go-interpreter/token"
 )
@@ -193,5 +194,54 @@ func (bs *BlockStatement) String() string {
 	for _, s := range bs.Statements {
 		b.WriteString(s.String())
 	}
+	return b.String()
+}
+
+type FunctionLiteral struct {
+	Token      token.Token // func
+	Parameters []*Identifier
+	Body       *BlockStatement
+}
+
+func (fl *FunctionLiteral) expressionNode()      {}
+func (fl *FunctionLiteral) TokenLiteral() string { return fl.Token.Literal }
+func (fl *FunctionLiteral) String() string {
+	var b bytes.Buffer
+
+	params := []string{}
+	for _, p := range fl.Parameters {
+		params = append(params, p.String())
+	}
+
+	b.WriteString(fl.TokenLiteral())
+	b.WriteString("(")
+	b.WriteString(strings.Join(params, ", "))
+	b.WriteString(")")
+	b.WriteString(fl.Body.String())
+
+	return b.String()
+}
+
+type CallExpression struct {
+	Token     token.Token // '('
+	Function  Expression  // Identifer or FunctionLiteral
+	Arguments []Expression
+}
+
+func (ce *CallExpression) expressionNode()      {}
+func (ce *CallExpression) TokenLiteral() string { return ce.Token.Literal }
+func (ce *CallExpression) String() string {
+	var b bytes.Buffer
+
+	args := []string{}
+	for _, a := range ce.Arguments {
+		args = append(args, a.String())
+	}
+
+	b.WriteString(ce.Function.String())
+	b.WriteString("(")
+	b.WriteString(strings.Join(args, ", "))
+	b.WriteString(")")
+
 	return b.String()
 }
