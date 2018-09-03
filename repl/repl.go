@@ -6,7 +6,7 @@ import (
 	"io"
 
 	"github.com/ymgyt/go-interpreter/lexer"
-	"github.com/ymgyt/go-interpreter/token"
+	"github.com/ymgyt/go-interpreter/parser"
 )
 
 const PROMPT = ">> "
@@ -23,9 +23,21 @@ func Start(r io.Reader, w io.Writer) {
 
 		line := s.Text()
 		l := lexer.New(line)
+		p := parser.New(l)
 
-		for tok := l.NextToken(); tok.Type != token.EOF; tok = l.NextToken() {
-			fmt.Fprintf(w, "%+v\n", tok)
+		program := p.ParseProgram()
+		if len(p.Errors()) != 0 {
+			printParserErrors(w, p.Errors())
+			continue
 		}
+
+		io.WriteString(w, program.String())
+		io.WriteString(w, "\n")
+	}
+}
+
+func printParserErrors(w io.Writer, errors []error) {
+	for _, err := range errors {
+		io.WriteString(w, "\t"+err.Error()+"\n")
 	}
 }
