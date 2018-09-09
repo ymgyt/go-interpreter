@@ -1,6 +1,12 @@
 package object
 
-import "fmt"
+import (
+	"bytes"
+	"fmt"
+	"strings"
+
+	"github.com/ymgyt/go-interpreter/ast"
+)
 
 type ObjectType string
 
@@ -10,9 +16,8 @@ const (
 	NULL_OBJ         = "NULL"
 	RETURN_VALUE_OBJ = "RETRUN_VALUE"
 	ERROR_OBJ        = "ERROR"
+	FUNCTION_OBJ     = "FUNCTION"
 )
-
-var hoge string = "abc"
 
 type Object interface {
 	Type() ObjectType
@@ -51,3 +56,28 @@ type Error struct {
 
 func (e *Error) Type() ObjectType { return ERROR_OBJ }
 func (e *Error) Inspect() string  { return "ERROR: " + e.Message }
+
+type Function struct {
+	Parameters []*ast.Identifier
+	Body       *ast.BlockStatement
+	Env        *Environment
+}
+
+func (f *Function) Type() ObjectType { return FUNCTION_OBJ }
+func (f *Function) Inspect() string {
+	var b bytes.Buffer
+
+	parames := []string{}
+	for _, p := range f.Parameters {
+		parames = append(parames, p.String())
+	}
+
+	b.WriteString("fn")
+	b.WriteString("(")
+	b.WriteString(strings.Join(parames, ", "))
+	b.WriteString(") {\n")
+	b.WriteString(f.Body.String())
+	b.WriteString("\n}")
+
+	return b.String()
+}
