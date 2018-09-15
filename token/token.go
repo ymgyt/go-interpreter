@@ -48,6 +48,9 @@ const (
 	// array
 	LBRACKET = "["
 	RBRACKET = "]"
+
+	// hash
+	COLON = ":"
 )
 
 type Token struct {
